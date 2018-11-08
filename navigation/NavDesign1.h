@@ -48,9 +48,9 @@ std::shared_ptr<Node> GetBlock() // TODO: figure out how to identify which point
 RoomInfo GetRoomInfo();
 
 private:
-    std::unique_ptr<Node> mp_north = nullptr; // pointer to the Node to the north of the current block
+    std::unique_ptr<Node> mp_north = nullptr; // pointer to the Node to the North of the current block
     std::unique_ptr<Node> mp_south = nullptr; // pointer to the Node to the South of the current block
-    std::unique_ptr<Node> mp_west = nullptr; // pointer to the Node to the west of the current block
+    std::unique_ptr<Node> mp_west = nullptr; // pointer to the Node to the West of the current block
     std::unique_ptr<Node> mp_east = nullptr; // pointer to the Node to the East of the current block.
 
     RoomInfo m_room; // Information about the room represented by the node
