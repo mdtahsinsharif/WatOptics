@@ -45,7 +45,7 @@ bool SetRoomInfo(int, const std::string&, TYPE);
 
 // Getters 
 std::shared_ptr<Node> GetBlock() // TODO: figure out how to identify which pointer we want returned
-RoomInfo GetRoomInfo();
+RoomInfo GetRoomInfo(); // Return the room information
 
 private:
     std::unique_ptr<Node> mp_north = nullptr; // pointer to the Node to the North of the current block
