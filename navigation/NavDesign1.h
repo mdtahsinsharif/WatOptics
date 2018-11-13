@@ -18,7 +18,7 @@ The map of the building has been laid with a grid and each node represents a par
 
 namespace watoptics {
 
-enum class Type {
+enum class BlockType {
     ROOM,
     BATHROOM_M,
     BATHROOM_F,
@@ -36,7 +36,7 @@ enum class Direction {
 struct RoomInfo {
     int m_room = 0; // room number
     std::string m_buildingName; // name of the building 
-    TYPE m_type; // type of the physical space
+    BlockType m_type; // type of the physical space
 };
 
 class Node {
