@@ -2,11 +2,13 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-img = cv2.imread('pic.JPG',0)
-img2 = cv2.imread('dc_3rd.JPG',0)
+img = cv2.imread('pic.JPG',150)
+img2 = cv2.imread('dc_3rd.JPG',150)
 
-laplacian = cv2.Laplacian(img,cv2.CV_64F)
-laplacian2 = cv2.Laplacian(img2,cv2.CV_64F)
+blurred = cv2.GaussianBlur(img,(5,5),0)
+laplacian = cv2.Laplacian(blurred,cv2.CV_64F)
+blurred2 = cv2.GaussianBlur(img2,(5,5),0)
+laplacian2 = cv2.Laplacian(blurred2,cv2.CV_64F)
 
 #sobelx = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=5)
 #sobely = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=5)
