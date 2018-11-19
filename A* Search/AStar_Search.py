@@ -27,7 +27,7 @@ class AStarGraph(object):
         dx = abs(start[0] - goal[0])
         dy = abs(start[1] - goal[1])
         return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
-
+        
     def get_vertex_neighbours(self, pos):
         n = []
         #Moves allow link a chess king
