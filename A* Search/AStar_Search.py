@@ -5,10 +5,8 @@ import numpy as np
 
 class AStarGraph(object):
     #Define a class board like grid with two barriers
-    # global gridCol
-    # global gridRows
-    # gridCol = 10
-    # gridRows = 10
+    global blockCost
+    blockCost = 10000
     def __init__(self, r, c):
         self.barriers = []
         self.barriers.append([])
@@ -45,7 +43,7 @@ class AStarGraph(object):
     def move_cost(self, a, b):
         for barrier in self.barriers:
             if b in barrier:
-                return 100000 #Extremely high cost to enter barrier squares
+                return blockCost #Extremely high cost to enter barrier squares
         return 1 #Normal movement cost
 
 def AStarSearch(start, end, graph):
@@ -78,6 +76,8 @@ def AStarSearch(start, end, graph):
                 current = cameFrom[current]
                 path.append(current)
             path.reverse()
+            if F[end] >= blockCost:
+                raise RuntimeError("A* failed to find a solution")
             return path, F[end] #Done!
 
         #Mark the current vertex as closed
