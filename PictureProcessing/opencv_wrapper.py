@@ -5,7 +5,6 @@ def ProcessImage(path):
         ## Read in image
         img_large = cv2.imread(path)
         img = cv2.resize(img_large, (0,0), fx=1, fy=1)
-        # Assume that the image is already grayscale
 
         ## Convert to array, detect edges
         blurred = cv2.GaussianBlur(img, (3,3), 0)
@@ -16,7 +15,6 @@ def ProcessImage(path):
 
 def DrawContours(img, cnt, index):
     cv2.drawContours(img, [cnt], index, (150,0,0), 3)
-
 
 def DisplayImage(text, img):
     ## Diplay image
@@ -46,6 +44,11 @@ def GetRelevantContours(edges):
         # DisplayImage('Canny', edged)
         return cnt4, cnt5
 
+def GetHoleCenterpoints(cnt):
+        M = cv2.moments(cnt)
+	cX = int(M["m10"] / M["m00"])
+	cY = int(M["m01"] / M["m00"])
+        return cX, cY
 
 ## for debugging only
 # edged = ProcessImage("data/simple.jpg")

@@ -2,13 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import triangle as tr
-import pp_getcontours as pp
-
-def GetHoleCenterpoints(cnt):
-        M = cv2.moments(cnt)
-	cX = int(M["m10"] / M["m00"])
-	cY = int(M["m01"] / M["m00"])
-        return cX, cY
+import opencv_wrapper as pp
         
 def CreateNavMesh(pathToPic):
         edged = pp.ProcessImage(pathToPic)
@@ -42,7 +36,7 @@ def CreateNavMesh(pathToPic):
         
         holes = []
         for cnt in blk:
-                [x, y] = GetHoleCenterpoints(cnt)
+                [x, y] = pp.GetHoleCenterpoints(cnt)
                 holes.append([x, y])
 
         A = {'vertices':np.array(v), 'segments': np.array(s), 'segment_markers': np.array(sm), 
@@ -53,4 +47,4 @@ def CreateNavMesh(pathToPic):
         plt.show()
 
 if __name__ == "__main__":
-        CreateNavMesh("data/pic_nolabel.jpg")
+        CreateNavMesh("../data/pic_nolabel.jpg")
