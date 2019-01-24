@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 
 def ProcessImage(path):
+        '''
+        NOTE: Images must be only the map edges - no numbers or words
+        '''
         ## Read in image
         img_large = cv2.imread(path)
         img = cv2.resize(img_large, (0,0), fx=1, fy=1)
@@ -23,8 +26,14 @@ def DisplayImage(text, img):
     cv2.destroyAllWindows()
 
 def GetRelevantContours(edges):
-        ## returns all the contours in following order: 
+        ## returns all the convexhulls in following order: 
         ## outermost, inner contours
+        ## requires manual handling
+        '''
+        TODO:
+        [1] This function currently requires manual handling - we need to set the contours ourselves. 
+        [2] Test whether convexhulls are adequate 
+        '''
         _,contours,_ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         sorted(contours, key=cv2.contourArea, reverse=True)
         
