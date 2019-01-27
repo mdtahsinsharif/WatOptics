@@ -4,16 +4,14 @@ import triangle as tr
 
 box = tr.get_data('double_hex3')
 t = tr.triangulate(box, 'p')
+v = t['vertices'].tolist()
 print(box)
+tList = t['triangles'].tolist()
+tCoords = [] ## coordinates of the triangles: [[[0,0], [0,1], [1,0]], [...]]
+for tL in tList:
+        tCoords.append([v[tL[0]], v[tL[1]], v[tL[2]]])
+
+print(tCoords)
+
 tr.compare(plt, box, t)
 plt.show()
-
-
-# v = ['a', 'b', 'c', 'd']
-
-# i = 0
-# while i in range(len(v)-1):
-#     print(i)
-#     print("[i, i+1]: ", i, i+1)
-#     i = i+1
-# print(i, i - (len(v)-1))

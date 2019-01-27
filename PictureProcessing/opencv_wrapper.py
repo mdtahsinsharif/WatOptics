@@ -1,14 +1,15 @@
 import cv2
 import numpy as np
 
-def ProcessImage(path):
+def ReadImage(path):
+        img = cv2.imread(path)
+        return img
+
+
+def ProcessImage(img):
         '''
         NOTE: Images must be only the map edges - no numbers or words
-        '''
-        ## Read in image
-        img_large = cv2.imread(path)
-        img = cv2.resize(img_large, (0,0), fx=1, fy=1)
-
+        '''        
         ## Convert to array, detect edges
         blurred = cv2.GaussianBlur(img, (3,3), 0)
         gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
@@ -49,7 +50,7 @@ def GetRelevantContours(edges):
         # print(len(contours))
         cnt4 = cv2.convexHull(contours[4], False)
         cnt5 = cv2.convexHull(contours[5], False)
-        # DrawContours(edges, contours[2], -1)
+        # DrawContours(edges, cnt5, -1)
         # DisplayImage('Canny', edged)
         return cnt4, cnt5
 
@@ -59,7 +60,7 @@ def GetHoleCenterpoints(cnt):
 	cY = int(M["m01"] / M["m00"])
         return cX, cY
 
-## for debugging only
-# edged = ProcessImage("data/simple.jpg")
+# ## for debugging only
+# edged = ProcessImage("../data/pic_nolabel.jpg")
 # GetRelevantContours(edged)
 
