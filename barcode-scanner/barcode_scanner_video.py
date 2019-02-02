@@ -9,7 +9,7 @@ import datetime
 import imutils
 import time
 import cv2
-
+from time import sleep
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-o", "--output", type=str, default="barcodes.csv",
@@ -27,6 +27,7 @@ time.sleep(2.0)
 csv = open(args["output"], "w")
 found = set()
 
+###
 # loop over the frames from the video stream
 while True:
 	# grab the frame from the threaded video stream and resize it to
