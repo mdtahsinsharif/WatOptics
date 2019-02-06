@@ -1,8 +1,9 @@
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 import triangle as tr
 import opencv_wrapper as cv_wpr
 import polygon as nvs_p ## navspex polygon
+import matplot_wrapper as plt_wpr
 import math as m
 
 '''
@@ -138,42 +139,9 @@ def GetTriangles(trilist):
         
         return tIds
 
-def DrawShape(verts, clr):
-        plt.plot([v[0] for v in verts], [v[1] for v in verts], 'r-', linewidth=1.0, c=clr)
-        
-        ## complete closed shape
-        x = [verts[0][0], verts[len(verts)-1][0]]
-        y = [verts[0][1], verts[len(verts)-1][1]]
-        plt.plot(x, y, 'r-', linewidth=1.0, c=clr)
-
-def MarkMidpoint(x, y):
-        plt.scatter(x, y, s=80, c='blue', marker=(5, 0))
-
-def TestGetTriangles(tIds):
-        ## Draw all triangles
-        
-        ## pick random triangle and draw in different colour
-        ## draw all neighbors in a different different colour
-        ## verify manually
-        for i in range(len(tIds)):
-                triangle = tIds[i+1]
-                vertices = triangle.GetVertices()
-                DrawShape(vertices, 'gray')
-
-        triangle = tIds[5] ## manually choosing triangle
-        for nId in triangle.GetNeighbors():
-                neighbor = tIds[nId[0]]
-                DrawShape(neighbor.GetVertices(), 'orange')
-                print(nId[1])
-                MarkMidpoint(neighbor.GetMidpoint()[0], neighbor.GetMidpoint()[1])
-        
-        DrawShape(triangle.GetVertices(), 'red')
-        MarkMidpoint(triangle.GetMidpoint()[0], triangle.GetMidpoint()[1])
-
-        plt.show()                
-
 # ## for debugging only
 # if __name__ == "__main__":
 #         tVertInd = CreateNavMesh("../data/pic_nolabel.jpg")
 #         tIds = GetTriangles(tVertInd)
-#         TestGetTriangles(tIds)
+#         plt_wpr.DrawNeighbors(tIds, 5)
+#         plt_wpr.ShowPlot()

@@ -27,7 +27,7 @@ class triangle:
         self.id = id
         self.vertices = vlist
         self.midpoint = midpoint(vlist)
-        self.neighbors = []
+        self.neighbors = [] ## ids of the neighboring triangles & their distances
     
     def AddNeighbor(self, id, d):
         self.neighbors.append([id, d])
