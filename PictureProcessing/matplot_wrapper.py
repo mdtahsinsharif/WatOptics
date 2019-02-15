@@ -12,6 +12,9 @@ def DrawShape(verts, clr):
         y = [verts[0][1], verts[len(verts)-1][1]]
         plt.plot(x, y, 'r-', linewidth=1.0, c=clr)
 
+def DrawLine(verts, lw, clr):
+        plt.plot([v[0] for v in verts], [v[1] for v in verts], 'r-', linewidth=lw, c=clr)
+
 def MarkMidpoint(x, y, colour):
         plt.scatter(x, y, s=80, c=colour, marker=(5, 0))
 

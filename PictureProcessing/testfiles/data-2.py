@@ -3,9 +3,10 @@ import matplotlib.pyplot as plt
 import triangle as tr
 
 box = tr.get_data('double_hex3')
+print(box)
 t = tr.triangulate(box, 'p')
 v = t['vertices'].tolist()
-print(box)
+# print(box)
 tList = t['triangles'].tolist()
 tCoords = [] ## coordinates of the triangles: [[[0,0], [0,1], [1,0]], [...]]
 for tL in tList:

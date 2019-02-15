@@ -2,6 +2,7 @@ from PictureProcessing import polygon as p
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 import math as m
+import numpy as np
 
 def gradient(p1, p2):
     '''
@@ -16,6 +17,8 @@ def gradient(p1, p2):
     dx = p1[0] - p2[0]
     dy = p1[1] - p2[1]
 
+    if dy == 0 :
+        return 1000
     return dx/dy
 
 def Heuristic(p1, p2):
@@ -212,11 +215,10 @@ def Optimize(path):
         
         i = i+1
 
-    if i != len(path):
-        newPath.append(path[i])
-    
     newPath.append(dest)
-    print(newPath)
+
+    
+    # print(newPath)
     return newPath
 
 

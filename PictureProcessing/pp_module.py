@@ -6,6 +6,7 @@ import polygon as nvs_p ## navspex polygon
 import matplot_wrapper as plt_wpr
 import math as m
 
+import matplotlib.pyplot as plt
 '''
 Notes:
 [1] https://rufat.be/triangle/API.html
@@ -22,9 +23,12 @@ TODO:
         Update: 'pD' gives better triangles
 '''
 
-def CreateNavMesh(pathToImg):
-        img = cv_wpr.ReadImage(pathToImg)
+def ReadImage(pathToImg):
+        img = cv_wpr.ImgToNumpy(pathToImg)
         edged = cv_wpr.ProcessImage(img)
+        return img, edged
+
+def CreateNavMesh(edged):
         cnts = cv_wpr.GetRelevantContours(edged) 
 
         v = []
@@ -39,8 +43,10 @@ def CreateNavMesh(pathToImg):
         start_index = 0
         for cnt in cnts:
                 ## add to vertex, vertex marker = ctr
+                # print(cnt)
                 for i in range(len(cnt)):
-                        v.append((int(cnt[i][0][0]), int(cnt[i][0][1])))
+                        print(cnt[i][0], int(cnt[i][1]))
+                        v.append((int(cnt[i][0]), int(cnt[i][1])))
                         vm.append([ctr])
                 j = start_index
                 while j in range(start_index + len(cnt) - 1):        
@@ -51,23 +57,26 @@ def CreateNavMesh(pathToImg):
                 s.append([j, j-(len(cnt)-1)])
                 sm.append([ctr])
                 ctr = ctr+1
-                start_index = len(cnt)
+                start_index += len(cnt)
         
         holes = []
         for cnt in blk:
-                [x, y] = cv_wpr.GetHoleCenterpoints(cnt)
+                [x, y] = cv_wpr.GetHoleCenterpoints(np.array(cnt))
                 holes.append([x, y])
 
-        A = {'vertices':np.array(v), 'segments': np.array(s), 'segment_markers': np.array(sm), 
-                'vertex_markers': np.array(vm), 'holes': np.array(holes)}
+        # print("reached")
 
-        B = tr.triangulate(A, 'p') ## prefer this or p?
+        A = {'segment_markers': np.array(sm), 'segments': np.array(s), 'vertex_markers': np.array(vm), 
+                'vertices':np.array(v), 'holes': np.array(holes)}
+        # print(A)
+        B = tr.triangulate(A, 'p')
         
-        # ## Only for Debugging
+        # # ## Only for Debugging
         # tr.plot(plt.axes(), **B)
         # plt.show()
         
         v = np.array(v)
+        # print(B)
         tList = B['triangles'].tolist()
         tCoords = [] ## coordinates of the triangles: [[[0,0], [0,1], [1,0]], [...]]
         for t in tList:
@@ -139,9 +148,10 @@ def GetTriangles(trilist):
         
         return tIds
 
-# ## for debugging only
+## for debugging only
 # if __name__ == "__main__":
-#         tVertInd = CreateNavMesh("../data/pic_nolabel.jpg")
+#         img, edged = ReadImage("../data/e5_4f_nolabel.jpg")
+#         tVertInd = CreateNavMesh(edged)
 #         tIds = GetTriangles(tVertInd)
 #         plt_wpr.DrawNeighbors(tIds, 5)
 #         plt_wpr.ShowPlot()

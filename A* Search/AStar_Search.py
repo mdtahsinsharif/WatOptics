@@ -19,20 +19,18 @@ class AStarGraph(object):
         
     def getBarrier(self,x,y):
         return self.barriers;
-    
+            
     def heuristic(self, start, goal):
-        #Use Chebyshev distance heuristic if we can move one square either
-        #adjacent or diagonal
-        D = 1
-        D2 = 1
         dx = abs(start[0] - goal[0])
         dy = abs(start[1] - goal[1])
-        return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
-        
+
+        return dx + dy
+
     def get_vertex_neighbours(self, pos):
         n = []
         #Moves allow link a chess king
-        for dx, dy in [(1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,1),(1,-1),(-1,-1)]:
+        # for dx, dy in [(1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,1),(1,-1),(-1,-1)]:
+        for dx, dy in [(1,0), (-1,0), (0,1), (0,-1)]:
             x2 = pos[0] + dx
             y2 = pos[1] + dy
             if x2 < 0 or x2 > self.gridCol or y2 < 0 or y2 > self.gridRows:
@@ -77,7 +75,7 @@ def AStarSearch(start, end, graph):
                 path.append(current)
             path.reverse()
             if F[end] >= blockCost:
-                raise RuntimeError("A* failed to find a solution")
+                raise RuntimeError("A* Blocked Path!")
             return path, F[end] #Done!
 
         #Mark the current vertex as closed
@@ -104,41 +102,61 @@ def AStarSearch(start, end, graph):
     raise RuntimeError("A* failed to find a solution")
 
 if __name__=="__main__":
-    # graph = AStarGraph(10, 10)
-    # graph.addBarrier(4,3)
-    # graph.addBarrier(7,6)
-    # graph.addBarrier(6,6)
-###############    
-    img = cv2.imread('tiny_img.jpg',0)
-    # print(img)
-    # img2 = cv2.imread('dc_3rd.JPG',150)
+    # Load the image & resize
+    img_large = cv2.imread('data/pic.JPG',0)
+    img = cv2.resize(img_large, (0,0), fx=0.25, fy=0.25)
 
+    # Blur the image and convert to array
     blurred = cv2.GaussianBlur(img,(5,5),0)
-    laplacian = cv2.Laplacian(blurred,cv2.CV_64F)
-
-    # newlaplacian = laplacian
+    laplacian = cv2.Canny(blurred, 50, 200, 255)
     num_rows = len(laplacian)
     num_columns = len(laplacian[0])
-    graph = AStarGraph(num_rows, num_columns)
+    
+    # create a graph with the required columns and rows
+    graph = AStarGraph(num_columns, num_rows)
+
+    # filter the array to limit to 1s and 0s
+    # Add all zero indexes to barriers list in graph
     for i in range(num_rows):
         for j in range(num_columns):
-            if laplacian[i][j] <= 5: #found this number by trial and error, need to find a way to do this for all maps
-                # newlaplacian[i][j] = 1
+            if laplacian[i][j] <= 10:
                 laplacian[i][j] = 1
             else:
-                # newlaplacian[i][j] = 0
                 laplacian[i][j] = 0
                 graph.addBarrier(i,j)
 
-#################
+    # # Get user input 
+    # start = raw_input("Enter starting room: ")
+    # dest = raw_input("Enter destination room: ")
 
-    result, cost = AStarSearch((0,0), (10,5), graph)
-    print ("route", result)
-    print ("cost", cost)
-    # print(graph.barriers)
-    plt.plot([v[0] for v in result], [v[1] for v in result])
+    # # initial hard code for room locations
+    # rooms = {
+    #     "A" : [26, 11],
+    #     "B" : [26, 56],
+    #     "C" : [48, 11],
+    #     "D" : [47, 56]
+    # }
+
+    # # Assume the input from user is valid (Room is A, B, C or D)
+    # src_x = rooms[start][0]
+    # src_y = rooms[start][1]
+    # dest_x = rooms[dest][0]
+    # dest_y = rooms[dest][1]
+    # src_z = np.sqrt(src_x**2 + src_y**2)
+    # verts = np.array([[-1, -1], [1, -1], [1, 1], [-1, -1]])
+
+    # # Send the location, destination and graph to A*
+    # result, cost = AStarSearch((src_x,src_y), (dest_x,dest_y), graph)
+    # print ("route", result)
+    # print ("cost", cost)
+
+    # # Plot the final result
+    # plt.plot([v[0] for v in result], [v[1] for v in result], 'r-', linewidth=3.0)
+    # plt.scatter(src_x, src_y, s=80, c=src_z, marker=(12, 0))
+    # plt.scatter(dest_x, dest_y, s=100, c=src_z, marker='D')
     for barrier in graph.barriers:
-        plt.scatter([v[0] for v in barrier], [v[1] for v in barrier])
-    plt.xlim(-1,num_columns)
-    plt.ylim(-1,num_rows)
+        plt.scatter([v[0] for v in barrier], [v[1] for v in barrier], c='black')
+
+    plt.xlim(0,num_rows)
+    plt.ylim(0,num_columns)
     plt.show()
