@@ -1,4 +1,4 @@
-# import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt ## for debugging CreateNavMesh
 import numpy as np
 import triangle as tr
 import opencv_wrapper as cv_wpr
@@ -6,7 +6,6 @@ import polygon as nvs_p ## navspex polygon
 import matplot_wrapper as plt_wpr
 import math as m
 
-import matplotlib.pyplot as plt
 '''
 Notes:
 [1] https://rufat.be/triangle/API.html
@@ -64,19 +63,15 @@ def CreateNavMesh(edged):
                 [x, y] = cv_wpr.GetHoleCenterpoints(np.array(cnt))
                 holes.append([x, y])
 
-        # print("reached")
-
         A = {'segment_markers': np.array(sm), 'segments': np.array(s), 'vertex_markers': np.array(vm), 
                 'vertices':np.array(v), 'holes': np.array(holes)}
-        # print(A)
         B = tr.triangulate(A, 'p')
         
-        # # ## Only for Debugging
+        # ## Only for Debugging
         # tr.plot(plt.axes(), **B)
         # plt.show()
         
         v = np.array(v)
-        # print(B)
         tList = B['triangles'].tolist()
         tCoords = [] ## coordinates of the triangles: [[[0,0], [0,1], [1,0]], [...]]
         for t in tList:

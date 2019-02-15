@@ -33,39 +33,23 @@ def FindContours(img):
 
 
 def GetRelevantContours(edges):
-        ## returns all the convexhulls in following order: 
-        ## outermost, inner contours
-        ## requires manual handling
         '''
+        Functionality: 
+        Returns the coordinates of the rectangle contours on the map.
+        The order of the returned list: 
+        outer most contour, inner contour 1, inner contour 2... 
+
         TODO:
         [1] This function currently requires manual handling - we need to set the contours ourselves. 
-        [2] Test whether convexhulls are adequate 
         '''
-        # contours = FindContours(edges)        
-        '''
-        For pic_nolabel.jpg:
-        contours[4] -- outer
-        contours[5] -- inner
-        cnt4 = [(20, 20),(20, 663),(1393, 663), (1393, 20)]
-        cnt5 = [(97, 70), (97, 623), (1323, 623), (1323, 70)]        
-
-
-        For simple.jpg:
-        contours[1] -- outer
-        contours[2] -- inner
-        '''
-        # print(len(contours))
-        # cnt4 = cv2.convexHull(contours[4], False)
-        # cnt5 = cv2.convexHull(contours[5], False)
-        # DrawContours(edges, cnt5, -1)
-        # DisplayImage('Canny', edged)
-        '''
-        ## pic_nolabel.jpg
-        rec_coords = [
-                [(20, 20),(20, 663),(1393, 663), (1393, 20)],
-                [(97, 70), (97, 623), (1323, 623), (1323, 70)]
-        ]
-        '''
+        
+        # ## pic_nolabel.jpg
+        # rec_coords = [
+        #         [(20, 20),(20, 663),(1393, 663), (1393, 20)],
+        #         [(97, 70), (97, 623), (1323, 623), (1323, 70)]
+        # ]
+        
+        # ## e5_4f_nolabel.jpg
         rec_coords = [
                 [(16, 16), (16, 567), (1676, 567), (1676, 16)],
                 [(17, 17), (17, 115), (342, 115), (342, 17)],
@@ -80,6 +64,8 @@ def GetRelevantContours(edges):
                 [(17, 468), (17, 566), (342, 566), (342, 468)],
                 [(378, 468), (378, 566), (1675, 566), (1675, 468)]
         ]
+        
+        
         return rec_coords
 
 def GetHoleCenterpoints(cnt):
@@ -89,14 +75,12 @@ def GetHoleCenterpoints(cnt):
         return cX, cY
 
 def DrawLines(verts, img, thickness):
-        # line_img = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
         for i in range(len(verts)-1):
                 cv2.arrowedLine(img, verts[i], verts[i+1], (0, 0, 255), thickness)
         
         return img
 
 def DrawCircles(points, img, thickness):
-        # line_img = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
         for point in points:
                 cv2.circle(img, point, 3, (0,0,0), thickness)
         return img
@@ -107,6 +91,11 @@ def OverlayImage(img, initial_img, a=0.6, b=2, c=0.):
 
 ## Testing functions ##
 def FigureOutContours(path):
+        '''
+        The purpose of this function is:
+        1) to draw the image using cv2 so that the coordinates can be noted down
+        2) once the coordinates have been taken down, to draw the rectangles for reconfirmation
+        '''
         img = ImgToNumpy(path)
         edged = ProcessImage(img)
 
@@ -126,11 +115,12 @@ def FigureOutContours(path):
                 [(378, 468), (378, 566), (1675, 566), (1675, 468)]
         ]
 
-        ## pic_nolabel.jpg
+        # ## pic_nolabel.jpg
         # l = [
         #         [(20, 20),(1393, 663)],
         #         [(95, 70), (1323, 623)],
         # ]
+
         for index in l: 
                 cv2.rectangle(edged, (index[0][0],index[0][1]), (index[2][0], index[2][1]), (150,0,0), 2)
 
@@ -146,7 +136,6 @@ def TestContours(path):
 # TestContours("../data/simple.jpg")
 # FigureOutContours("../data/e5_4f_nolabel.jpg")
 
-## Just draw the image {to get coords}
 
 
 
