@@ -44,7 +44,6 @@ def CreateNavMesh(edged):
                 ## add to vertex, vertex marker = ctr
                 # print(cnt)
                 for i in range(len(cnt)):
-                        print(cnt[i][0], int(cnt[i][1]))
                         v.append((int(cnt[i][0]), int(cnt[i][1])))
                         vm.append([ctr])
                 j = start_index

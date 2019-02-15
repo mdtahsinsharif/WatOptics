@@ -35,6 +35,7 @@ def DebugPathFinding():
     ## simple.jpg: (18,16), (69,82)
     ## Points for e5_4f_nolabel.jpg
     ## (36, 116), (1581, 458)
+    
     ## Get user input 
     # s = raw_input("Enter starting room: ")
     # e = raw_input("Enter destination room: ")
