@@ -138,7 +138,7 @@ def FindPolygonsInPath(tIds, start, end):
             elif dist > G[nId]:
                 continue ## this cost is worse, do nothing
 
-            G[nId] = dist
+            G[nId] = costToNeighbor
             cameFrom[nId] = current
             F[nId] = G[nId] + Heuristic(tIds[nId].GetMidpoint(), tIds[end].GetMidpoint())
             
