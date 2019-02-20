@@ -86,7 +86,7 @@ def AddNeighbors(t1, t2):
         '''
         x1, y1 = t1.GetMidpoint()
         x2, y2 = t2.GetMidpoint()
-        distance = int(m.sqrt((x1-x2)**2 + (y1-y2)**2))
+        distance = int(abs(x1-x2) + abs(y1-y2))
 
         t1.AddNeighbor(t2.GetId(), distance)
         t2.AddNeighbor(t1.GetId(), distance)
@@ -125,11 +125,6 @@ def GetTriangles(trilist):
                 y0 = vlist[0][1]
                 xN = vlist[j][0]
                 yN = vlist[j][1]
-
-                ## add to dictionary
-                edges.setdefault(
-                        "({},{})".format(xN,yN), 
-                                []).append(tId)
                 
                 s1 = set(edges["({},{})".format(xN, yN)])
                 s2 = set(edges["({},{})".format(x0, y0)])
@@ -143,9 +138,11 @@ def GetTriangles(trilist):
         return tIds
 
 ## for debugging only
-# if __name__ == "__main__":
-#         img, edged = ReadImage("../data/e5_4f_nolabel.jpg")
-#         tVertInd = CreateNavMesh(edged)
-#         tIds = GetTriangles(tVertInd)
-#         plt_wpr.DrawNeighbors(tIds, 5)
-#         plt_wpr.ShowPlot()
+if __name__ == "__main__":
+        img, edged = ReadImage("../data/e5_4f_nolabel.jpg")
+        tVertInd, hard_edges = CreateNavMesh(edged)
+        tIds = GetTriangles(tVertInd)
+        # print(hard_edges)
+        # plt_wpr.DrawNeighbors(tIds, 5)
+        # plt_wpr.ShowPlot()
+

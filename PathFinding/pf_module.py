@@ -73,17 +73,19 @@ def FindStartEndPoly(tIds, current, dest):
     return start, end  
 
 
-def FindPolygonsInPath(tIds, start, end):
+def FindPolygonsInPath(tIds, current, dest):
     '''
     Inputs:
-    start: id of the triangle where the current location of the user lies
-    end: id of the triangle where the destination lies
+    current: coordinates of the current location of the user
+    dest: coordinates of the destination
     tIds: dictionary; maps triangle Ids to actual triangles
     
     Output:
     returns a list containing the ids of the triangles which form the fastest path
     from the start to the end
     '''
+
+    start, end = FindStartEndPoly(tIds, current, dest)
 
     ## cameFrom -> tId and tId
     ## G -> tId && current min value
@@ -115,6 +117,11 @@ def FindPolygonsInPath(tIds, start, end):
                 current = cameFrom[current]
                 path.append(current)
             path.reverse()
+
+            # for node in path: 
+            #     print(node, G[node])
+            
+            # print(end, G[end])
             return path, G[end]
 
         ## Add to explored and remove from unexplored
@@ -144,6 +151,111 @@ def FindPolygonsInPath(tIds, start, end):
             
     raise RuntimeError("Algorithm failed to find a solution")
 
+def getSegments(tIds, path, start):
+    current = start
+    grad_old = 0
+    segments = []
+    for i in range(len(path)):
+        next_m = tIds[path[i]].GetMidpoint()
+
+        dx = current[0] - next_m[0]
+        dy = current[1] - next_m[1]
+
+        print(i, dx, dy)
+
+        if dx == 0:
+            grad_new = 100
+        elif dy == 0:
+            grad_new = 0.1
+        else:
+            grad_new = abs(dy/dx)
+        
+        if (grad_new/4 >= grad_old) or (grad_old/4 >= grad_new): ## chosen factor of 10
+            segments.append(i)
+
+        current = next_m
+        grad_old = grad_new
+
+    return segments
+
+def Optimizer(tIds, path, start, dest):
+    '''
+    With the initial list of ids which are potentially involved in this path,
+    this function will come up with a final list of coordinates to visit.
+    '''
+
+    newpath = []
+    newpath.append(start)
+    if len(path) == 1:
+        # both the start and dest are in the same triangle
+        newpath.append(dest)
+        return newpath
+
+    segments = getSegments(tIds, path, start)    
+    print(path)
+    print(segments)
+
+    ## for each segment, find the avg_x and avg_y values
+    ## 0 - start to 0
+    ## 1 - 0 to 1 and so on
+
+    avg_coords = []
+    avg_coords.append((start[0], start[1], -1)) ## -1 indicates we're not sure which {x or y} is constant
+
+    for j in range(len(segments)-1):
+        segmented_path = path[segments[j]:segments[j+1]]
+        length = len(segmented_path)
+
+        first = tIds[segmented_path[0]].GetMidpoint()
+        last = tIds[segmented_path[length-1]].GetMidpoint()
+
+        dx_local = abs(first[0]-last[0])
+        dy_local = abs(first[1]-last[1])
+
+        sum_x = 0
+        sum_y = 0
+
+        for id in segmented_path:
+            point = tIds[id].GetMidpoint()
+            sum_x += point[0]
+            sum_y += point[1]
+
+        avg_x = sum_x/length
+        avg_y = sum_y/length
+
+        ## if dx_local >= dy_local, change in x is greater and y will be constant
+        ## therefore, x, y, 1 {indicating y is constant}
+        ## otherwise x, y, 0 {indicating x is constant}
+        avg_coords.append((avg_x, avg_y, (dx_local >= dy_local)))
+    
+    avg_coords.append((dest[0], dest[1], -1))
+
+    optPath = []
+    optPath.append(start)
+    for i in range(len(avg_coords)-1):
+        current = avg_coords[i]
+        nextc = avg_coords[i+1]
+        # print(current)
+        if current[2] == -1:
+            ## check the next one
+            ## if next is 0: it means its x is constant
+            ## so we will append (next(x), current(y))
+            ## if next is 1: (current(x), next(y))
+            if nextc == 0:
+                optPath.append((nextc[0], current[1]))
+            else:
+                optPath.append((current[0], nextc[1]))
+            
+        elif current[2] == 0:
+            ## x must stay constant
+            ## end point here will be: (current(x), next(y))
+            optPath.append((current[0], nextc[1]))
+        else:  
+            optPath.append((nextc[0], current[1]))
+    optPath.append(dest)
+
+    return optPath
+
 def FindPath(tIds, current, dest):
     '''
     High level function
@@ -162,64 +274,9 @@ def FindPath(tIds, current, dest):
     path: the Ids of the triangles in the path
     dist: the total distance from current to dest using the above coordinates
     '''
-    s, e = FindStartEndPoly(tIds, current, dest)
-    path, dist = FindPolygonsInPath(tIds, s, e)
-
-    coordinates = [current]
-    for id in path: 
-        coordinates.append(tIds[id].GetMidpoint())
-    coordinates.append(dest)
-
-    s_midpoint = tIds[path[0]].GetMidpoint()
-    e_midpoint = tIds[path[len(path)-1]].GetMidpoint()
-
-    extra_dist_s = int(m.sqrt((current[0]-s_midpoint[0])**2 + (current[1]-s_midpoint[1])**2))
-    extra_dist_e = int(m.sqrt((dest[0]-e_midpoint[0])**2 + (dest[1]-e_midpoint[1])**2))
-    dist += extra_dist_s + extra_dist_e
-
+    path, dist = FindPolygonsInPath(tIds, current, dest)
+    coordinates = Optimizer(tIds, path, current, dest)
     return coordinates, path, dist
-
-def Optimize(path):
-    '''
-    Inputs: 
-    path: list of points in order to be visited in order to reach the dest
-        the first point (x,y) is the start and the last is dest
-    
-    Outputs:
-    newPath: shorter list of points, ideally, when connected together still
-        get the user from the start to the dest without going to barriers
-    '''
-
-    newPath = [] ## start point must be there 
-    dest = path[len(path)-1]
-
-    i = 0 ## start
-    while i < len(path)-2:        
-        current = path[i]
-        newPath.append(path[i])
-
-        n1 = path[i+1]
-        n2 = path[i+2]
-        n1_dist = Heuristic(path[i+1], dest)
-        n2_dist = Heuristic(path[i+2], dest)
-
-        if n2_dist <= n1_dist:
-            ## possibility of skipping n1
-            ## check the gradient of the line.
-            grad = abs(gradient(current, n2))
-            if grad <= 0.5 or grad >= 2: ## chosen parameters
-            ## dx and dy must be a factor of 2 different than
-            ## each other or the line is too / 
-                i = i+2
-                continue
-        
-        i = i+1
-
-    newPath.append(dest)
-
-    
-    # print(newPath)
-    return newPath
 
 
 
