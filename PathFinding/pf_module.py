@@ -156,7 +156,8 @@ def getSegments(tIds, path, start):
     grad_old = 0
     segments = []
     segments.append(0)
-    for i in range(len(path)):
+    i = 1
+    while i < len(path):
         next_m = tIds[path[i]].GetMidpoint()
 
         dx = current[0] - next_m[0]
@@ -175,7 +176,11 @@ def getSegments(tIds, path, start):
 
         current = next_m
         grad_old = grad_new
+        i += 1
 
+    if segments[len(segments)-1] != path[len(path)-1]:
+        segments.append(path[len(path)-1])
+    
     return segments
 
 def Optimizer(tIds, path, start, dest):
