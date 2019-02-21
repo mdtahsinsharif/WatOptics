@@ -155,22 +155,22 @@ def getSegments(tIds, path, start):
     current = start
     grad_old = 0
     segments = []
+    segments.append(0)
     for i in range(len(path)):
         next_m = tIds[path[i]].GetMidpoint()
 
         dx = current[0] - next_m[0]
         dy = current[1] - next_m[1]
 
-        print(i, dx, dy)
-
         if dx == 0:
-            grad_new = 100
-        elif dy == 0:
-            grad_new = 0.1
+            grad_new = 10
         else:
-            grad_new = abs(dy/dx)
+            grad_new = abs(dy)/abs(dx)
+
+        print(i, dx, dy, grad_new)
         
-        if (grad_new/4 >= grad_old) or (grad_old/4 >= grad_new): ## chosen factor of 10
+        if ((grad_new/4 >= grad_old) or (grad_old/4 >= grad_new)) and not (grad_new ==0 and grad_old==0): ## chosen factor of 10
+            ## Note: if grad_new and grad_old are both 0, the first conditions are always met. 
             segments.append(i)
 
         current = next_m
@@ -253,6 +253,8 @@ def Optimizer(tIds, path, start, dest):
         else:  
             optPath.append((nextc[0], current[1]))
     optPath.append(dest)
+
+    print("optPath: ", optPath)
 
     return optPath
 

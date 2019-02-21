@@ -144,17 +144,17 @@ def DebugPathFinding():
 
     mindist = 10000
     for i in range(len(end)):
-        print("start: ", start)
-        print("dest: ", end[i])
+        # print("start: ", start)
+        # print("dest: ", end[i])
         coords1, path1, dist = pf.FindPath(tIds, start, end[i])
         if dist < mindist:
             endcoords = end[i]
             coords = coords1
             path = path1
             mindist = dist
-        print("dist: ", dist)
+        # print("dist: ", dist)
 
-    print(coords)
+    # print(coords)
 
     # shortPath = pf.Optimize(coords)
     imgLines = wo_cv2.DrawLines(coords, img_label.copy(), 3)
