@@ -156,7 +156,6 @@ def DebugPathFinding():
 
     # print(coords)
 
-    # shortPath = pf.Optimize(coords)
     imgLines = wo_cv2.DrawLines(coords, img_label.copy(), 3)
     imgFinal = wo_cv2.DrawCircles((start, endcoords), imgLines, 3)
     wo_cv2.DisplayImage('Final image', imgFinal)    

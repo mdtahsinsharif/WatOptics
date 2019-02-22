@@ -12,14 +12,19 @@ def gradient(p1, p2):
     p2: (x,y) of point 2
 
     Output: 
-    dx/dy of line from p1 to p2
+    dy/dx of line from p1 to p2
     '''
+ 
     dx = p1[0] - p2[0]
     dy = p1[1] - p2[1]
 
-    if dy == 0 :
-        return 1000
-    return dx/dy
+    if abs(dx) < abs(dy):
+        grad = 10
+    else:
+        grad = abs(dy)/abs(dx)
+
+    return grad, dx, dy
+    
 
 def Heuristic(p1, p2):
     '''
@@ -151,37 +156,39 @@ def FindPolygonsInPath(tIds, current, dest):
             
     raise RuntimeError("Algorithm failed to find a solution")
 
-def getSegments(tIds, path, start):
-    current = start
-    grad_old = 0
+def getSegments(tIds, path, start, end):
     segments = []
     segments.append(0)
+    
+    current = tIds[path[0]].GetMidpoint()
+    grad_old, dx, dy = gradient(start, current)
+
+    direction = []
+    direction.append(grad_old)
+
     i = 1
     while i < len(path):
         next_m = tIds[path[i]].GetMidpoint()
 
-        dx = current[0] - next_m[0]
-        dy = current[1] - next_m[1]
-
-        if dx == 0:
-            grad_new = 10
-        else:
-            grad_new = abs(dy)/abs(dx)
+        grad_new, dx, dy = gradient(current, next_m)
 
         print(i, dx, dy, grad_new)
         
-        if ((grad_new/4 >= grad_old) or (grad_old/4 >= grad_new)) and not (grad_new ==0 and grad_old==0): ## chosen factor of 10
+        if ((grad_new/4 >= grad_old) or (grad_old/4 >= grad_new)) and not (grad_new == grad_old): ## chosen factor of 10
+            ## and not (grad_new ==0 and grad_old==0)
             ## Note: if grad_new and grad_old are both 0, the first conditions are always met. 
             segments.append(i)
+            direction.append(grad_new)
 
         current = next_m
         grad_old = grad_new
         i += 1
 
-    if segments[len(segments)-1] != path[len(path)-1]:
-        segments.append(path[len(path)-1])
+    # if segments[len(segments)-1] != path[len(path)-1]:
+    #     # segments.append(path[len(path)-1])
+    #     direction.append(gradient(current, end)[0])
     
-    return segments
+    return segments, direction
 
 def Optimizer(tIds, path, start, dest):
     '''
@@ -196,26 +203,28 @@ def Optimizer(tIds, path, start, dest):
         newpath.append(dest)
         return newpath
 
-    segments = getSegments(tIds, path, start)    
+    segments, direction = getSegments(tIds, path, start, dest)    
     print(path)
     print(segments)
+
+    ## for debugging
+    # seg_coords = []
+    # for i in range(len(segments)):
+    #     seg_coords.append(tIds[path[i]].GetMidpoint())
+    
+    # print(seg_coords)
 
     ## for each segment, find the avg_x and avg_y values
     ## 0 - start to 0
     ## 1 - 0 to 1 and so on
 
     avg_coords = []
-    avg_coords.append((start[0], start[1], -1)) ## -1 indicates we're not sure which {x or y} is constant
+    avg_coords.append((start[0], start[1], direction[0])) ## -1 indicates we're not sure which {x or y} is constant
 
     for j in range(len(segments)-1):
         segmented_path = path[segments[j]:segments[j+1]]
+        print(segmented_path)
         length = len(segmented_path)
-
-        first = tIds[segmented_path[0]].GetMidpoint()
-        last = tIds[segmented_path[length-1]].GetMidpoint()
-
-        dx_local = abs(first[0]-last[0])
-        dy_local = abs(first[1]-last[1])
 
         sum_x = 0
         sum_y = 0
@@ -231,32 +240,25 @@ def Optimizer(tIds, path, start, dest):
         ## if dx_local >= dy_local, change in x is greater and y will be constant
         ## therefore, x, y, 1 {indicating y is constant}
         ## otherwise x, y, 0 {indicating x is constant}
-        avg_coords.append((avg_x, avg_y, (dx_local >= dy_local)))
-    
-    avg_coords.append((dest[0], dest[1], -1))
+        avg_coords.append((avg_x, avg_y, direction[j]))
+
+    avg_coords.append((dest[0], dest[1], direction[len(direction)-1]))
 
     optPath = []
     optPath.append(start)
     for i in range(len(avg_coords)-1):
+        print(avg_coords[i][2])
+        # optPath.append((avg_coords[i][0],avg_coords[i][1]))
         current = avg_coords[i]
         nextc = avg_coords[i+1]
         # print(current)
-        if current[2] == -1:
-            ## check the next one
-            ## if next is 0: it means its x is constant
-            ## so we will append (next(x), current(y))
-            ## if next is 1: (current(x), next(y))
-            if nextc == 0:
-                optPath.append((nextc[0], current[1]))
-            else:
-                optPath.append((current[0], nextc[1]))
-            
-        elif current[2] == 0:
+        if current[2] > 0:
             ## x must stay constant
             ## end point here will be: (current(x), next(y))
             optPath.append((current[0], nextc[1]))
         else:  
             optPath.append((nextc[0], current[1]))
+
     optPath.append(dest)
 
     print("optPath: ", optPath)
