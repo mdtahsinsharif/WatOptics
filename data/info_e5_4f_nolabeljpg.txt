@@ -2,6 +2,8 @@ e5_4f_nolabel.jpg
 
 path: data/e5_4f_nolabel.jpg
 
+scale: 235:12 [pixels:meters]
+
 rectangle coordinates:
 [
 		[(16, 16), (16, 567), (1676, 567), (1676, 16)],

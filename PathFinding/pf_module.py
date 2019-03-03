@@ -18,10 +18,12 @@ def gradient(p1, p2):
     dx = p1[0] - p2[0]
     dy = p1[1] - p2[1]
 
-    if abs(dx) < abs(dy):
-        grad = 10
-    else:
-        grad = abs(dy)/abs(dx)
+    if abs(dx) <= abs(dy): ## in the case where dx = dy, we are forcing x movement first.
+        # grad = 10
+        grad = 1
+    else: ## dx > dy
+        # grad = abs(dy)/abs(dx)
+        grad = 0
 
     return grad, dx, dy
     
@@ -154,41 +156,36 @@ def FindPolygonsInPath(tIds, current, dest):
             cameFrom[nId] = current
             F[nId] = G[nId] + Heuristic(tIds[nId].GetMidpoint(), tIds[end].GetMidpoint())
             
-    raise RuntimeError("Algorithm failed to find a solution")
+    raise RuntimeError("Algorithm failed to find a solution")    
 
 def getSegments(tIds, path, start, end):
     segments = []
-    segments.append(0)
+    segments.append(1)
     
-    current = tIds[path[0]].GetMidpoint()
-    grad_old, dx, dy = gradient(start, current)
+    direction_prev = []
+    
+    prevp = tIds[path[1]].GetMidpoint()
+    currentp = tIds[path[2]].GetMidpoint()
 
-    direction = []
-    direction.append(grad_old)
+    grad_prev = gradient(prevp, currentp)[0]
 
-    i = 1
-    while i < len(path):
-        next_m = tIds[path[i]].GetMidpoint()
-
-        grad_new, dx, dy = gradient(current, next_m)
-
-        print(i, dx, dy, grad_new)
+    i = 2
+    while i < len(path)-1:
+        nextp = tIds[path[i+1]].GetMidpoint()
+        grad_new = gradient(currentp, nextp)[0]
         
-        if ((grad_new/4 >= grad_old) or (grad_old/4 >= grad_new)) and not (grad_new == grad_old): ## chosen factor of 10
-            ## and not (grad_new ==0 and grad_old==0)
-            ## Note: if grad_new and grad_old are both 0, the first conditions are always met. 
+        if grad_new != grad_prev:
             segments.append(i)
-            direction.append(grad_new)
-
-        current = next_m
-        grad_old = grad_new
+            direction_prev.append(grad_prev) ## before this point, we were moving in grad_prev direction
+        
+        currentp = nextp
+        grad_prev = grad_new
         i += 1
-
-    # if segments[len(segments)-1] != path[len(path)-1]:
-    #     # segments.append(path[len(path)-1])
-    #     direction.append(gradient(current, end)[0])
     
-    return segments, direction
+    segments.append(i) ## i = len(path) - 1 
+    direction_prev.append(grad_prev)
+    print("segments: ", segments)
+    return segments, direction_prev
 
 def Optimizer(tIds, path, start, dest):
     '''
@@ -204,26 +201,13 @@ def Optimizer(tIds, path, start, dest):
         return newpath
 
     segments, direction = getSegments(tIds, path, start, dest)    
-    print(path)
-    print(segments)
+    # print(path)
+    # print(segments)
 
-    ## for debugging
-    # seg_coords = []
-    # for i in range(len(segments)):
-    #     seg_coords.append(tIds[path[i]].GetMidpoint())
-    
-    # print(seg_coords)
+    avg_points = []
 
-    ## for each segment, find the avg_x and avg_y values
-    ## 0 - start to 0
-    ## 1 - 0 to 1 and so on
-
-    avg_coords = []
-    avg_coords.append((start[0], start[1], direction[0])) ## -1 indicates we're not sure which {x or y} is constant
-
-    for j in range(len(segments)-1):
-        segmented_path = path[segments[j]:segments[j+1]]
-        print(segmented_path)
+    for i in range(len(segments)-1):
+        segmented_path = path[segments[i]:segments[i+1]+1] ## if segments from 0 to 5, we want index 5 included 
         length = len(segmented_path)
 
         sum_x = 0
@@ -231,36 +215,45 @@ def Optimizer(tIds, path, start, dest):
 
         for id in segmented_path:
             point = tIds[id].GetMidpoint()
+            print("p ", point)
             sum_x += point[0]
             sum_y += point[1]
 
         avg_x = sum_x/length
-        avg_y = sum_y/length
+        avg_y = sum_y/length  
 
-        ## if dx_local >= dy_local, change in x is greater and y will be constant
-        ## therefore, x, y, 1 {indicating y is constant}
-        ## otherwise x, y, 0 {indicating x is constant}
-        avg_coords.append((avg_x, avg_y, direction[j]))
+        avg_points.append((avg_x, avg_y))
 
-    avg_coords.append((dest[0], dest[1], direction[len(direction)-1]))
+    print("avg ", avg_points)
 
+    ## avg_points contains the avg of all the corridors at this point ideally. 
+
+    ## digitize and append the start and end points 
     optPath = []
+
     optPath.append(start)
-    for i in range(len(avg_coords)-1):
-        print(avg_coords[i][2])
-        # optPath.append((avg_coords[i][0],avg_coords[i][1]))
-        current = avg_coords[i]
-        nextc = avg_coords[i+1]
-        # print(current)
-        if current[2] > 0:
-            ## x must stay constant
-            ## end point here will be: (current(x), next(y))
-            optPath.append((current[0], nextc[1]))
-        else:  
-            optPath.append((nextc[0], current[1]))
+    current = start
 
+    for i in range(len(avg_points)):
+        d = direction[i] ## dx <= dy ---> move in y? 
+        print("direction ", d)
+        point = avg_points[i]
+        if d: ## moving in y
+            optPath.append((point[0], current[1]))
+        else: ## moving in x 
+            optPath.append((current[0], point[1]))
+
+        # optPath.append(point)
+        current = point
+
+    d = gradient(point, dest)
+
+    if not d:
+        optPath.append((point[0], dest[1]))
+    else:
+        optPath.append((dest[0], point[1]))
+    
     optPath.append(dest)
-
     print("optPath: ", optPath)
 
     return optPath
