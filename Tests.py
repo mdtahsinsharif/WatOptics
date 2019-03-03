@@ -167,6 +167,7 @@ def DebugPathFinding():
     # print(coords)
 
     print(coords1)
+    pf.GetInstructions(coords1, mapScale*strideMen)
 
     imgLines = wo_cv2.DrawLines(coords, img_label.copy(), 3)
     imgFinal = wo_cv2.DrawCircles((start, endcoords), imgLines, 3)

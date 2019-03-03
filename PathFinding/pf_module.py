@@ -27,7 +27,6 @@ def gradient(p1, p2):
 
     return grad, dx, dy
     
-
 def Heuristic(p1, p2):
     '''
     Inputs: 
@@ -41,7 +40,6 @@ def Heuristic(p1, p2):
     dx = abs(p1[0]-p2[0])
     dy = abs(p1[1]-p2[1])
     return dx + dy
-
 
 def FindStartEndPoly(tIds, current, dest):
     '''
@@ -78,7 +76,6 @@ def FindStartEndPoly(tIds, current, dest):
         raise RuntimeError("Current location not found")
 
     return start, end  
-
 
 def FindPolygonsInPath(tIds, current, dest):
     '''
@@ -161,7 +158,6 @@ def FindPolygonsInPath(tIds, current, dest):
 def getSegments(tIds, path, start, end):
     segments = []
     segments.append(1)
-    
     direction_prev = []
     
     prevp = tIds[path[1]].GetMidpoint()
@@ -193,9 +189,13 @@ def Optimizer(tIds, path, start, dest):
     this function will come up with a final list of coordinates to visit.
     '''
 
+    ## Issues with rooms: 4032-4036
+    ## 4116 - 4112
+    ## 4017 - 4116
+
     newpath = []
     newpath.append(start)
-    if len(path) == 1:
+    if len(path) <= 1: ## TODO: This should be 2, and we need to digitize
         # both the start and dest are in the same triangle
         newpath.append(dest)
         return newpath
@@ -280,6 +280,54 @@ def FindPath(tIds, current, dest):
     path, dist = FindPolygonsInPath(tIds, current, dest)
     coordinates = Optimizer(tIds, path, current, dest)
     return coordinates, path, dist
+
+def getTurn(p1, p2, p3):
+    '''
+    https://stackoverflow.com/questions/38856588/given-three-coordinate-points-how-do-you-detect-when-the-angle-between-them-cro?rq=1
+    '''
+    crossproduct = (p2[0] - p1[0]) * (p3[1] - p1[1]) - (p2[1] - p1[1]) * (p3[0] - p1[0])
+
+    if crossproduct == 0:
+        return 'F'
+    elif crossproduct > 0:
+        return 'R'
+    else:
+        return 'L'
+
+def getNumSteps(p1, p2, sc):
+    stepsx = m.ceil(abs(p1[0] - p2[0])/sc)
+    stepsy = m.ceil(abs(p1[1] - p2[1])/sc)
+
+    if stepsx != 0:
+        return stepsx
+    else:
+        return stepsy
+
+def GetInstructions(path, sc): ## sc = stride scale
+    ## ASSUMPTION: We start with our back to the door
+    ## TODO: Global sc
+
+    instructions = [] ## list of tuples (dir, num steps)
+    
+    if len(path) <= 1:
+        ## no path, already at destination
+        return 
+
+    instructions.append(('F', getNumSteps(path[0], path[1], sc)))
+
+    i = 1
+    prevp = path[0]
+    currentp = path[1]
+    while i in range(len(path) - 1):
+        nextp = path[i+1]
+
+        direction = getTurn(np.array(prevp), np.array(currentp), np.array(nextp))
+        instructions.append((direction, getNumSteps(currentp, nextp, sc)))
+        currentp = nextp
+        i +=1
+    
+    print(instructions)
+    return instructions
 
 
 
