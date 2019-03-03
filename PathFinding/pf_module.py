@@ -240,18 +240,19 @@ def Optimizer(tIds, path, start, dest):
         point = avg_points[i]
         if d: ## moving in y
             optPath.append((point[0], current[1]))
+            current = (point[0], current[1])
         else: ## moving in x 
             optPath.append((current[0], point[1]))
+            current = (current[0], point[1])
 
         # optPath.append(point)
-        current = point
 
-    d = gradient(point, dest)
+    d = gradient(current, dest)
 
     if not d:
-        optPath.append((point[0], dest[1]))
+        optPath.append((current[0], dest[1]))
     else:
-        optPath.append((dest[0], point[1]))
+        optPath.append((dest[0], current[1]))
     
     optPath.append(dest)
     print("optPath: ", optPath)
