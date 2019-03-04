@@ -180,7 +180,7 @@ def getSegments(tIds, path, start, end):
     
     segments.append(i) ## i = len(path) - 1 
     direction_prev.append(grad_prev)
-    print("segments: ", segments)
+    # print("segments: ", segments)
     return segments, direction_prev
 
 def Optimizer(tIds, path, start, dest):
@@ -215,7 +215,7 @@ def Optimizer(tIds, path, start, dest):
 
         for id in segmented_path:
             point = tIds[id].GetMidpoint()
-            print("p ", point)
+            # print("p ", point)
             sum_x += point[0]
             sum_y += point[1]
 
@@ -224,7 +224,7 @@ def Optimizer(tIds, path, start, dest):
 
         avg_points.append((avg_x, avg_y))
 
-    print("avg ", avg_points)
+    # print("avg ", avg_points)
 
     ## avg_points contains the avg of all the corridors at this point ideally. 
 
@@ -237,25 +237,23 @@ def Optimizer(tIds, path, start, dest):
     for i in range(len(avg_points)):
         d = direction[i] ## dx <= dy ---> move in y? 
         point = avg_points[i]
-        print("direction ", d)
+        # print("direction ", d)
         if d: ## moving in y
-            optPath.append((point[0], current[1]))
+            optPath.append((int(point[0]), int(current[1])))
             current = (point[0], current[1])
         else: ## moving in x 
-            optPath.append((current[0], point[1]))
+            optPath.append((int(current[0]), int(point[1])))
             current = (current[0], point[1])
-
-        # optPath.append(point)
 
     d = gradient(current, dest)[0]
 
     if d:
-        optPath.append((current[0], dest[1]))
+        optPath.append((int(current[0]), int(dest[1])))
     else:
-        optPath.append((dest[0], current[1]))
+        optPath.append((int(dest[0]), int(current[1])))
     
     optPath.append(dest)
-    print("optPath: ", optPath)
+    # print("optPath: ", optPath)
 
     return optPath
 
@@ -326,7 +324,7 @@ def GetInstructions(path, sc): ## sc = stride scale
         currentp = nextp
         i +=1
     
-    print(instructions)
+    # print(instructions)
     return instructions
 
 

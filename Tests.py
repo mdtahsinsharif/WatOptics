@@ -1,6 +1,6 @@
 from PictureProcessing import pp_module as pp
 from PictureProcessing import opencv_wrapper as wo_cv2
-from PictureProcessing import matplot_wrapper as wo_plt
+# from PictureProcessing import matplot_wrapper as wo_plt
 from PathFinding import pf_module as pf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -138,9 +138,9 @@ def DebugPathFinding():
     ## (36, 116), (1581, 458)
     
     ## Get user input 
-    s = raw_input("Enter starting room: ")
+    s = input("Enter starting room: ")
     s = s.split(" ")
-    e = raw_input("Enter destination room: ")
+    e = input("Enter destination room: ")
 
     # start = (36, 116)
     # end = (1581, 458)

@@ -1,9 +1,9 @@
 # import matplotlib.pyplot as plt ## for debugging CreateNavMesh
 import numpy as np
 import triangle as tr
-import opencv_wrapper as cv_wpr
-import polygon as nvs_p ## navspex polygon
-import matplot_wrapper as plt_wpr
+from PictureProcessing import opencv_wrapper as cv_wpr
+from PictureProcessing import polygon as nvs_p ## navspex polygon
+# import matplot_wrapper as plt_wpr
 import math as m
 
 '''
@@ -138,11 +138,11 @@ def GetTriangles(trilist):
         return tIds
 
 ## for debugging only
-if __name__ == "__main__":
-        img, edged = ReadImage("../data/e5_4f_nolabel.jpg")
-        tVertInd, hard_edges = CreateNavMesh(edged)
-        tIds = GetTriangles(tVertInd)
-        # print(hard_edges)
-        # plt_wpr.DrawNeighbors(tIds, 5)
-        # plt_wpr.ShowPlot()
+# if __name__ == "__main__":
+#         img, edged = ReadImage("../data/e5_4f_nolabel.jpg")
+#         tVertInd = CreateNavMesh(edged)
+#         tIds = GetTriangles(tVertInd)
+#         # print(hard_edges)
+#         # plt_wpr.DrawNeighbors(tIds, 5)
+#         # plt_wpr.ShowPlot()
 

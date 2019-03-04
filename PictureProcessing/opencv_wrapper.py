@@ -70,8 +70,8 @@ def GetRelevantContours(edges):
 
 def GetHoleCenterpoints(cnt):
         M = cv2.moments(cnt)
-	cX = int(M["m10"] / M["m00"])
-	cY = int(M["m01"] / M["m00"])
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
         return cX, cY
 
 def DrawLines(verts, img, thickness):
